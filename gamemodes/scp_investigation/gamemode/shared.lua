@@ -2,14 +2,17 @@ local gamemode = GM
 
 gamemode.Name = "SCP Investigation"
 gamemode.Author = "GMod Team"
-gamemode.Version = "0.3.0"
+gamemode.Version = "0.4.0"
 
 SCP = SCP or {}
 SCP.Version = gamemode.Version
 SCP.MaxPlayers = 3
 SCP.EvidenceRequired = 3
+SCP.SCPId = "SCP-173"
+SCP.SCPClass = "Euclid"
+SCP.SCPName = "The Sculpture"
+SCP.RequiredObservers = 2
 SCP.ExtractionRadius = 180
-SCP.AnomalyHealth = 100
 SCP.StartMap = "gm_boreas"
 SCP.MissionMinSeparation = 2200
 SCP.MissionMaxCandidates = 5000
@@ -200,6 +203,10 @@ if SERVER then
         gamemode.Anomaly:Spawn()
         PlaceOnGround(gamemode.Anomaly, points[4])
 
+        gamemode.ContainmentControl = ents.Create("scp_containment")
+        gamemode.ContainmentControl:SetPos(points[4] + Vector(80, 0, 4))
+        gamemode.ContainmentControl:Spawn()
+
         print(string.format(
             "[SCP] Mission spawned on %s | navmesh=%d | extraction=%s | evidence=%s / %s / %s | anomaly=%s",
             game.GetMap(),
@@ -233,11 +240,7 @@ if SERVER then
             if not IsValid(ply) then return end
 
             for _, class in ipairs(SCP.WeaponLoadout) do
-                if weapons.Get(class) then
-                    ply:Give(class)
-                else
-                    print("[SCP] Loadout weapon unavailable: " .. tostring(class))
-                end
+                ply:Give(class)
             end
 
             ply:SetWalkSpeed(160)
@@ -247,7 +250,7 @@ if SERVER then
 
     function gamemode:CheckExtraction(ply)
         if self.SCPState ~= "extraction" then return false end
-        if not IsValid(self.Anomaly) or self.Anomaly:Health() > 0 then return false end
+        if not IsValid(self.Anomaly) or not self.Anomaly:GetContained() then return false end
 
         if IsValid(self.ExtractionOrigin)
             and ply:GetPos():DistToSqr(self.ExtractionOrigin:GetPos()) <= SCP.ExtractionRadius ^ 2 then

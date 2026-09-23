@@ -1,9 +1,9 @@
 include("shared.lua")
 
 local evidenceNames = {
-    [1] = "FIELD CAMERA",
-    [2] = "RESEARCH NOTES",
-    [3] = "ANOMALOUS SAMPLE"
+    [1] = "SECURITY FOOTAGE",
+    [2] = "CONTAINMENT REPORT",
+    [3] = "CONCRETE TRACE"
 }
 
 function ENT:Draw()

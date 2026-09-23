@@ -1,8 +1,10 @@
 ENT.Type = "anim"
 ENT.Base = "base_anim"
-ENT.PrintName = "Anomalous Core"
+ENT.PrintName = "SCP-173"
 ENT.Spawnable = false
 
 function ENT:SetupDataTables()
-    self:NetworkVar("Int", 0, "AnomalyHealth")
+    self:NetworkVar("Bool", 0, "Observed")
+    self:NetworkVar("Bool", 1, "Contained")
+    self:NetworkVar("String", 0, "BehaviorState")
 end

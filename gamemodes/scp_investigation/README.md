@@ -2,39 +2,45 @@
 
 First playable vertical slice for the SCP co-op investigation project.
 
+## Current incident
+
+The first implemented SCP is **SCP-173**, the Euclid-class Sculpture.
+
+The official SCP-173 entry describes it as an animate, hostile concrete-and-rebar object that cannot move while directly observed. Its containment procedure requires multiple personnel and continuous direct observation while the chamber is entered. This gamemode turns those properties into the core co-op mechanic.
+
 ## Current loop
 
-1. Investigate three evidence objects.
-2. Use the evidence signal to locate the nearest remaining evidence.
-3. After all evidence is secured, the anomaly becomes the containment target.
-4. Use the anomaly tracker to locate it.
-5. Damage the anomaly until it is contained.
-6. Return to extraction.
+1. Investigate three SCP-173 evidence sources.
+2. Follow the evidence locator to find each source.
+3. Evidence reveals the incident and unlocks containment.
+4. Locate SCP-173.
+5. SCP-173 moves only while no living investigator has direct line of sight to it.
+6. Keep SCP-173 observed while a player reaches the containment control.
+7. The control requires two living observers when two or more players are alive. Solo testing uses one observer.
+8. SCP-173 becomes contained.
+9. Return to extraction.
 
-## HUD systems
+## SCP-173 behavior
 
-- Evidence signal with pulse/heartbeat-style strength and direction.
-- Evidence world beacons while investigating.
-- Anomaly direction and distance tracker during containment.
-- Anomaly world beacon.
+- Direct line of sight freezes SCP-173.
+- If unobserved, SCP-173 moves toward the nearest living investigator.
+- It attacks at close range.
+- It uses scraping concrete audio while moving.
+- Its state is networked as observed, moving, or contained.
+- The visual is currently a procedural concrete statue so the entity does not depend on a broken/missing model.
+
+## HUD
+
+- Evidence locator with distance and direction.
+- SCP-173 locator after evidence is complete.
+- Objective text for containment and extraction.
 - Bodycam toggle: F3.
-- Thermal view toggle: F4.
+- Thermal toggle: F4.
+- World-space evidence and SCP markers.
 
-## External weapons and content
+## External content
 
-The gamemode can use SWEPs supplied by other mounted GMod addons. Set the class names in gamemode/shared.lua:
-
-    SCP.WeaponLoadout = {
-        "weapon_crowbar",
-        "weapon_pistol",
-        -- "your_external_swep"
-    }
-
-The addon must be installed/mounted on the server. The gamemode checks that the SWEP exists before giving it to players.
-
-Workshop content can be registered in SCP.Workshop.IDs. resource.AddWorkshop makes custom content downloadable to clients, but it does not install the addon on the server. For server-side use, the addon itself still needs to be installed/mounted.
-
-Maps can be added to SCP.MapPool once they are installed. Mission map profiles will eventually define spawn points and objective locations per map instead of relying on fixed gm_construct coordinates.
+Workshop IDs can be registered through SCP.Workshop.IDs. resource.AddWorkshop only makes content downloadable to clients. The addon must still be installed/mounted server-side before its assets can be used.
 
 ## Source of truth
 

@@ -167,6 +167,7 @@ hook.Add("HUDPaint", "SCP_InvestigationHUD", function()
         DrawLocator(ply, evidenceEnt, "NEXT EVIDENCE", Color(220, 230, 235))
     elseif state == "containment" then
         local anomaly = ents.FindByClass("scp_anomaly")[1]
+        local control = ents.FindByClass("scp_containment")[1]
 
         draw.SimpleText(
             "OBJECTIVE",
@@ -177,14 +178,17 @@ hook.Add("HUDPaint", "SCP_InvestigationHUD", function()
         )
 
         draw.SimpleText(
-            "CONTAIN ANOMALOUS CORE",
+            "CONTAIN SCP-173",
             "SCP_HUD_Body",
             120,
             87,
             Color(235, 205, 195)
         )
 
-        DrawLocator(ply, anomaly, "ANOMALOUS CORE", Color(235, 95, 85))
+        DrawLocator(ply, anomaly, "SCP-173", Color(235, 95, 85))
+        if IsValid(control) then
+            draw.SimpleText("Use the containment control while the team keeps SCP-173 in sight", "SCP_HUD_Small", 34, 111, Color(175, 165, 160))
+        end
     elseif state == "extraction" then
         local extraction = ents.FindByName("scp_extraction")[1]
 
