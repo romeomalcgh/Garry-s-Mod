@@ -1,0 +1,5 @@
+util.AddNetworkString("SCP_ToggleBodycam")
+util.AddNetworkString("SCP_ToggleThermal")
+net.Receive("SCP_ToggleBodycam",function(_,ply) ply:SetNWBool("SCP_Bodycam",not ply:GetNWBool("SCP_Bodycam",true)) end)
+net.Receive("SCP_ToggleThermal",function(_,ply) ply:SetNWBool("SCP_Thermal",not ply:GetNWBool("SCP_Thermal",false)) end)
+hook.Add("PlayerDeath","SCP_InvestigationDeath",function(ply) ply:SetNWBool("SCP_Bodycam",true) ply:SetNWBool("SCP_Thermal",false) end)

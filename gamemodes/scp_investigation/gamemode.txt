@@ -1,0 +1,7 @@
+"SCP Investigation"
+{
+    "base" "sandbox"
+    "title" "SCP Investigation"
+    "menusystem" "1"
+    "maps" "gm_construct"
+}
