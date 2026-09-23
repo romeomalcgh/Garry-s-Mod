@@ -2,7 +2,7 @@ local gamemode = GM
 
 gamemode.Name = "SCP Investigation"
 gamemode.Author = "GMod Team"
-gamemode.Version = "0.1.2"
+gamemode.Version = "0.2.0"
 
 SCP = SCP or {}
 SCP.Version = gamemode.Version
@@ -11,6 +11,19 @@ SCP.EvidenceRequired = 3
 SCP.ExtractionRadius = 180
 SCP.AnomalyHealth = 100
 SCP.StartMap = "gm_construct"
+
+SCP.Workshop = SCP.Workshop or {
+    IDs = {}
+}
+
+SCP.WeaponLoadout = SCP.WeaponLoadout or {
+    "weapon_crowbar",
+    "weapon_pistol"
+}
+
+SCP.MapPool = SCP.MapPool or {
+    "gm_construct"
+}
 
 function SCP.IsInvestigator(ply)
     return IsValid(ply) and ply:IsPlayer()
@@ -24,16 +37,38 @@ if SERVER then
     util.AddNetworkString("SCP_ToggleBodycam")
     util.AddNetworkString("SCP_ToggleThermal")
 
+    for _, workshopId in ipairs(SCP.Workshop.IDs) do
+        if tostring(workshopId):match("^%d+$") then
+            resource.AddWorkshop(tostring(workshopId))
+        end
+    end
+
     gamemode.SCPState = "investigation"
     gamemode.EvidenceFound = 0
     gamemode.EvidenceRequired = SCP.EvidenceRequired
     gamemode.Anomaly = nil
     gamemode.ExtractionOrigin = nil
 
+    local function GroundPosition(pos)
+        local tr = util.TraceLine({
+            start = pos + Vector(0, 0, 1024),
+            endpos = pos - Vector(0, 0, 2048),
+            mask = MASK_SOLID_BRUSHONLY
+        })
+        return tr.Hit and (tr.HitPos + Vector(0, 0, 1)) or pos
+    end
+
+    local function PlaceOnGround(ent, pos)
+        if not IsValid(ent) then return end
+        local ground = GroundPosition(pos)
+        local mins = ent:OBBMins()
+        ent:SetPos(ground - Vector(0, 0, mins.z))
+    end
+
     local function SpawnMission()
         gamemode.ExtractionOrigin = ents.Create("info_target")
         gamemode.ExtractionOrigin:SetName("scp_extraction")
-        gamemode.ExtractionOrigin:SetPos(Vector(0, 0, 40))
+        gamemode.ExtractionOrigin:SetPos(GroundPosition(Vector(0, 0, 40)))
         gamemode.ExtractionOrigin:Spawn()
 
         for i, pos in ipairs({
@@ -42,14 +77,14 @@ if SERVER then
             Vector(-500, 0, 40)
         }) do
             local e = ents.Create("scp_evidence")
-            e:SetPos(pos)
             e:SetEvidenceId(i)
             e:Spawn()
+            PlaceOnGround(e, pos)
         end
 
         gamemode.Anomaly = ents.Create("scp_anomaly")
-        gamemode.Anomaly:SetPos(Vector(0, 900, 40))
         gamemode.Anomaly:Spawn()
+        PlaceOnGround(gamemode.Anomaly, Vector(0, 900, 40))
         print("[SCP] Mission spawned")
     end
 
@@ -71,8 +106,13 @@ if SERVER then
         player_manager.OnPlayerSpawn(ply)
         timer.Simple(0, function()
             if not IsValid(ply) then return end
-            ply:Give("weapon_crowbar")
-            ply:Give("weapon_pistol")
+            for _, class in ipairs(SCP.WeaponLoadout) do
+                if weapons.Get(class) then
+                    ply:Give(class)
+                else
+                    print("[SCP] Loadout weapon unavailable: " .. tostring(class))
+                end
+            end
             ply:SetWalkSpeed(160)
             ply:SetRunSpeed(260)
         end)
